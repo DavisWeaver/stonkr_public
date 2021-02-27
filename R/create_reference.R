@@ -66,11 +66,9 @@ clean_fundamentals <- function(df, year) {
 #' @inheritParams create_reference
 #'
 
-get_api_key <- function(vendor = "alphavantage") {
-  if(vendor == "alphavantage") {
-    return("5O8HJ8R8H9001QRC")
-  } else if(vendor == "quandl") {
-    return("swwZpTLG2pozy2rLidxc")
+get_api_key <- function(vendor = "quandl") {
+  } if(vendor == "quandl") {
+    return() #add you own API key here
   }
 }
 

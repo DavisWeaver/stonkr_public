@@ -7,9 +7,8 @@ Authors@R:
            role = c("aut", "cre"),
            email = "davis.weaver@case.edu",
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: PECOTA for stocks
-License: `use_mit_license()`, `use_gpl3_license()` or friends to
-    pick a license
+Description: data science tools to forecast future stock performance. 
+License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
@@ -22,7 +21,10 @@ Imports:
     lubridate, 
     forecast, 
     Quandl,
-    sweep
+    sweep, 
+    bizdays,
+    janitor,
+    zoo
 Suggests: 
     testthat (>= 2.0.0)
 Config/testthat/edition: 2

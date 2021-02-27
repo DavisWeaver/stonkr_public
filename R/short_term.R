@@ -6,132 +6,193 @@
 #' @param vendor provider for data
 #' @param look_back number of days to look back for predictions
 #' @param look_ahead number of days to forecast
-#'
-
-renarin_short <- function(ticker, vendor = "quandl", look_back = 90,
-                          look_ahead = 7) {
-  key <- get_api_key(vendor = vendor)
-  Quandl::Quandl.api_key(key)
-}
-
-#' function to generate forecast for a given ticker (using historical data).
-#'
-#' use nnet forecasting to evaluate future stock price.
-#'
-#' @param ticker security name, e.g. AAPL
-#' @param date if most recent == FALSE, what date should we project from?
-#' @param df if most_recent = FALSE, provide historical pricing dataframe
-#' @param look_back number of days to look back for predictions
-#' @param look_ahead number of days to forecast
-#' @param zoom_in should function return full model and forecast results? useful for highlighting speicific issues
-#'
+#' @param PI logical: should we compute prediction intervals?
+#' @inheritParams renarin_short_historic
 #'
 #' @importFrom magrittr %>%
 #' @export
 
-renarin_short_historic <- function(ticker, date = NULL,
-                          df = NULL, look_back = 300, look_ahead = 14,
-                          zoom_in = FALSE, lag = 10, decay = 0.2) {
-  #first filter data frame down to the specified date range
-  max_date <- date + lubridate::days(look_ahead)
+renarin_short <- function(ticker, vendor = "quandl", look_back = 200,
+                          look_ahead = 14, lag = 10, decay = 0.2,
+                          zoom_in = TRUE, PI = FALSE) {
+  ticker1 = ticker #just to avoid any bugs due to non-standard eval
+
+  date <- Sys.Date()
   min_date <- date - lubridate::days(look_back)
-
-  #need to rename user-provided ticker because the dplyr non-standard evaluation gets confused
-  ticker1 <- ticker
-
-  df_model <- df %>%
-    dplyr::filter(.data$ticker == ticker1,
-                  .data$date >= min_date & .data$date <= max_date) %>%
+  key <- get_api_key(vendor = vendor)
+  Quandl::Quandl.api_key(key)
+  df_model <- Quandl::Quandl.datatable('SHARADAR/SEP', date.gte=min_date,
+                   ticker= ticker1) %>%
     dplyr::mutate(close_log = log(.data$close),
                   rank = rank(date))
-  #add logical vec for training
-  df_model$training <- (df_model$date <= date)
 
-  #create zoo ts
-  df_model_train <- dplyr::filter(df_model, .data$training == TRUE)
-  ts_close <- diff(zoo::zoo(x = df_model_train$close_log, order.by = df_model_train$rank))
+  #create differenced ts for modeling
+  ts_close <- diff(zoo::zoo(x = df_model$close_log, order.by = df_model$rank))
 
-  #fit all the training points.
+  #don't want to try to fit if we don't have at least 80% of the points we wanted
+  if(length(ts_close) < 0.6*look_back) {
+    message(paste("not enough data to predict", ticker1, date))
+    return()
+  }
+
+  #fit the model and forecast
   fit <- forecast::nnetar(y = ts_close, p = lag, P = 1, decay = decay)
-  fcast <- forecast::forecast(fit, h = sum(df_model$training == FALSE), PI=TRUE)
+  fcast <- forecast::forecast(fit, h = look_ahead, PI=PI,
+                              bootstrap = TRUE)
 
+  #tidy this shit up
+  predic_df <- process_fit(fit = fit, fcast = fcast, df = df_model,
+                           look_ahead = look_ahead, PI = PI)
+
+  #add model fit and forecast back to data frame
+  df_model <- predic_df %>% dplyr::left_join(df_model) %>%
+    dplyr::mutate(fitted_actual = exp(undiff(x= .data$.fitted,
+                                             y = .data$close_log,
+                                             z = .data$rank)),
+                  fitted_log = undiff(x= .data$.fitted,
+                                      y = .data$close_log,
+                                      z = .data$rank))
+
+  if(PI == TRUE) {
+    df_model <- undiff_intervals(df_model)
+  }
+
+  df_model <- add_dates(df_model, date = date, look_ahead = look_ahead)
+  if(zoom_in == TRUE) {
+    return(df_model)
+  } else {
+    return(summarize_forecast(df_model))
+  }
+
+}
+
+#' helper function to undiff forecasts from renarin_short -
+#'
+#' tricky because the differences were lagged by one but the forecast lags by 10.
+#'
+#' @param x vector of differenced values to undiff
+#' @param y vector of reference values
+#' @param z vector of indices.
+#' @importFrom magrittr %>%
+
+
+undiff <- function(x,y,z) {
+  y_diff = c(NA, diff(y))
+  df = data.frame(x=x, y=y, y_diff = y_diff, z=z) %>%
+    dplyr::mutate(x = ifelse(is.na(.data$x), .data$y_diff, .data$x)) #impute missing x with y
+
+
+  #grab index value:
+  index <- dplyr::filter(df, .data$z %in% (min(.data$z))) %>% #some magic numbers - essentially we want to start at one behind the forecast + lag
+    dplyr::select(.data$y) %>% unlist()
+
+  #doesn't work with the one NA
+  df <- dplyr::filter(df, !is.na(.data$x))
+  x <- stats::diffinv((df$x), lag = 1, xi = index) #only diff between this and the historic one is that we don't need to reverse it.
+  return(x)
+}
+
+#' helper function to undiff forecasts from renarin_short -
+#'
+#' tricky because the differences were lagged by one but the forecast lags by 10.
+#'
+#' @param df model output
+#' @importFrom magrittr %>%
+
+undiff_intervals <- function(df) {
+  df <- df %>%
+    dplyr::mutate(hi_95 = .data$hi_95*.data$fitted_actual + .data$fitted_actual,
+                  hi_80 = .data$hi_80*.data$fitted_actual + .data$fitted_actual,
+                  lo_80 = .data$lo_80*.data$fitted_actual + .data$fitted_actual,
+                  lo_95 = .data$lo_95*.data$fitted_actual + .data$fitted_actual)
+  return(df)
+
+}
+
+
+#' helper function to process and join forecast output from renarin_short
+#'
+#' @param fit model fit object (from nnetar)
+#' @param fcast model forecast object
+#' @param look_ahead how many days did we forecast? inherits from \code{\link{renarin_short}}
+#' @param df model_df
+#' @importFrom magrittr %>%
+
+process_fit<- function(fit, fcast, df, look_ahead, PI) {
   #put together tidy data frame of model output
   fit_df <- sweep::sw_augment(fit)
   match_df <- data.frame(index = 1, .actual = NA, .fitted = NA, .resid = NA)
   fit_df <- rbind(match_df, fit_df) #have to do this step because the differencing step fucks it.
   colnames(fit_df)[colnames(fit_df) == "index"] <- "rank"
-  fit_df <- fit_df %>%
-    dplyr::mutate(point_forecast = NA,
-                  lo_80 = NA, hi_80 = NA,
-                  lo_95 = NA, hi_95 = NA)
+
+  if(PI == TRUE) {
+    fit_df <- fit_df %>%
+      dplyr::mutate(point_forecast = NA,
+                    lo_80 = NA, hi_80 = NA,
+                    lo_95 = NA, hi_95 = NA)
+  } else {
+    fit_df <- fit_df %>%
+      dplyr::mutate(point_forecast = NA)
+  }
+
 
 
   #tidy up forecast output.
   fcast_df <- as.data.frame(fcast) %>% janitor::clean_names()
-  fcast_df$rank <- (nrow(fit_df)+1):nrow(df_model)
+  fcast_df$rank <- (nrow(fit_df)+1):(nrow(df) + look_ahead)
   fcast_df <- fcast_df %>%
     dplyr::mutate(`.actual` = NA,
                   `.fitted` = .data$point_forecast,
                   `.resid` = NA)
 
-  predic_df <- rbind(fit_df, fcast_df)
-
-  as.ts()
-
-  #add model fit and forecast back to data frame
-  df_model <- df_model %>% dplyr::left_join(predic_df) #%>%
-    dplyr::mutate(fitted_actual = exp(diffinv(.data$.fitted)),
-                  hi_95 = .data$close + exp(.data$hi_95),
-                  lo_95 = .data$close + exp(.data$lo_95),
-                  hi_80 = .data$close + exp(.data$hi_80),
-                  lo_80 = .data$close + exp(.data$lo_80))
-
-  #summarize performance of forecast.
-
-  if(zoom_in == FALSE) {
-    out <- summarize_forecast(df_model)
-    return(out)
-  } else {
-    return(df_model)
-  }
-
-
+  return(rbind(fit_df, fcast_df))
 }
 
-#' function to summarize the output of short-term model (for back-testing)
+#' helper function to add dates to the projected time points
 #'
-#'
-#' @param df dataframe containing projections for a given time period
+#' @param df model output df
+#' @param date sys.date()
+#' @inheritParams renarin_short
 #' @importFrom magrittr %>%
 
-summarize_forecast <- function(df) {
-
-#first move limit to the forecast points
-forecast_df <- df %>% dplyr::filter(.data$training == FALSE) %>%
-  dplyr::mutate(resid = .data$fitted_actual - .data$close)
-
-
-
-last_point <- forecast_df %>% dplyr::filter(.data$date == max(.data$date))
-
-sum_tbl <- forecast_df %>%
-  dplyr::summarise(mse = mean(.data$resid^2),
-                   mae = max(.data$resid),
-                   ticker = unique(.data$ticker)) %>%
-  dplyr::mutate(above_median = (last_point$close > last_point$fitted_actual),
-                below_median = (last_point$close < last_point$fitted_actual),
-                within_80 = (last_point$close < last_point$hi_80 &
-                               last_point$close > last_point$lo_80),
-                within_95 = (last_point$close < last_point$hi_95 &
-                               last_point$close > last_point$lo_95),
-                close = last_point$close,
-                close_forecast = last_point$fitted_actual,
-                close_hi95 = last_point$hi_95,
-                close_lo95 = last_point$lo_95,
-                date = last_point$date)
-return(sum_tbl)
+add_dates <- function(df, date, look_ahead) {
+  end_bizday = bizdays::add.bizdays(date, n = look_ahead)
+  start_bizday = date + lubridate::days()
+  bizday_sequence <- bizdays::bizseq(from = start_bizday, to = end_bizday)
+  df$date[is.na(df$date)] <- bizday_sequence
+  return(df)
 }
 
-#' Function
+#' helper function to summarize forecast
+#'
+#' @param df model output df
+#' @importFrom magrittr %>%
+#'
+
+summarize_forecast <- function(df) {
+  forecast_period <- df %>%
+    dplyr::filter(is.na(close))
+
+  #get data frame of final forecast price
+  final_price <- forecast_period %>%
+    dplyr::filter(rank == max(.data$rank)) %>%
+    dplyr::select(.data$fitted_actual) %>% unlist()
+
+  index_price <- df %>%
+    dplyr::filter(!is.na(close)) %>%
+    dplyr::filter(rank == max(.data$rank))
+
+  tbl <- data.frame(index_price = index_price$close,
+                    final_price = final_price,
+                    max_price = max(forecast_period$fitted_actual),
+                    min_price = min(forecast_period$fitted_actual),
+                    ticker = unique(index_price$ticker)) %>%
+    dplyr::mutate(maximum_return = (.data$max_price/.data$index_price -1) * 100,
+                  maximum_loss = (.data$min_price/.data$index_price - 1) * 100,
+                  expected_return = (.data$final_price/.data$index_price -1) * 100)
+
+  return(tbl)
+
+}
 
 

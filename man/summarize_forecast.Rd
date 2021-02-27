@@ -2,13 +2,13 @@
 % Please edit documentation in R/short_term.R
 \name{summarize_forecast}
 \alias{summarize_forecast}
-\title{function to summarize the output of short-term model (for back-testing)}
+\title{helper function to summarize forecast}
 \usage{
 summarize_forecast(df)
 }
 \arguments{
-\item{df}{dataframe containing projections for a given time period}
+\item{df}{model output df}
 }
 \description{
-function to summarize the output of short-term model (for back-testing)
+helper function to summarize forecast
 }

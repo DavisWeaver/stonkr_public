@@ -4,7 +4,15 @@
 \alias{renarin_short}
 \title{function to generate forecast for a given ticker}
 \usage{
-renarin_short(ticker, vendor = "quandl", look_back = 90, look_ahead = 7)
+renarin_short(
+  ticker,
+  vendor = "quandl",
+  look_back = 200,
+  look_ahead = 14,
+  lag = 10,
+  decay = 0.2,
+  zoom_in = TRUE
+)
 }
 \arguments{
 \item{ticker}{security name, e.g. AAPL}
@@ -14,6 +22,12 @@ renarin_short(ticker, vendor = "quandl", look_back = 90, look_ahead = 7)
 \item{look_back}{number of days to look back for predictions}
 
 \item{look_ahead}{number of days to forecast}
+
+\item{lag}{number of days to use to fit the next day in the model}
+
+\item{decay}{NNET parametar}
+
+\item{zoom_in}{should function return full model and forecast results? useful for highlighting speicific issues}
 }
 \description{
 use nnet forecasting to evaluate future stock price.
