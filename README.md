@@ -21,7 +21,9 @@ full TOS here: https://app.termly.io/document/terms-of-use-for-saas/24d989ae-26f
 2. This package is currently only setup to work with a premium data feed from quandl https://www.quandl.com/databases/SEP/pricing/plans. 
 One of my goals is to set it up to use the yahoo finance API for users such as yourself.
 I had to use a premium feed during development because I was making so many API calls and need high-quality historic data. 
-If you decide to use it "out of the box" then you will need to sign up for that data table and then edit the "get_api_key" function in create_reference to contain your api key from quandl.
+If you decide to use it "out of the box" then you will need to sign up for that data table and then edit the "get_api_key" function in create_reference to contain your api key from quandl. 
+![image](https://user-images.githubusercontent.com/20169425/109398121-aaf7d500-7908-11eb-8fd6-a227c138483d.png)
+
 
 3. Some of the code that I use to actually generate reports you may have seen currently resides outside of the package. My first priority is to rectify that so you have access to all the functionality that I do. Expect a few more functions to appear on this repository in the next week or so. 
 
