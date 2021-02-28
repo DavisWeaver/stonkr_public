@@ -17,8 +17,8 @@ full TOS here: https://app.termly.io/document/terms-of-use-for-saas/24d989ae-26f
 # Getting Started
 
 1. To get started, you will need R and Rstudio installed on your computer as well as the package "devtools"
-2. Next, install this package on your computer using devtools::install_github("github.com/DavisWeaver/stonkr"). 
-3. To forecast share price for a given security, simply use:
+2. Next, install this package on your computer using devtools::install_github("DavisWeaver/stonkr", auth_token ="#GitHubPersonalAccessTokenHere"). The personal access Token can be generate from https://github.com/settings/tokens (thanks for @Hearthstone8888 for pointing out the auth_token issue).
+4. To forecast share price for a given security, simply use:
 ```
 renarin_short(ticker, zoom_in = FALSE)
 ```
