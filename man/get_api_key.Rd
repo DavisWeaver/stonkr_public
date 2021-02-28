@@ -4,7 +4,7 @@
 \alias{get_api_key}
 \title{internal function (me only) to return API key for different data vendors}
 \usage{
-get_api_key(vendor = "alphavantage")
+get_api_key(vendor = "quandl")
 }
 \arguments{
 \item{vendor}{which data warehouse - currently only works with the Sharadar tables from quandl}

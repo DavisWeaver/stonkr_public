@@ -4,7 +4,7 @@
 \alias{process_fit}
 \title{helper function to process and join forecast output from renarin_short}
 \usage{
-process_fit(fit, fcast, df, look_ahead)
+process_fit(fit, fcast, df, look_ahead, PI)
 }
 \arguments{
 \item{fit}{model fit object (from nnetar)}

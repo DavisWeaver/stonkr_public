@@ -11,7 +11,7 @@ add_dates(df, date, look_ahead)
 
 \item{date}{sys.date()}
 
-\item{look_ahead}{number of days to forecast}
+\item{look_ahead}{number of days to forecast: default is 14}
 }
 \description{
 helper function to add dates to the projected time points

@@ -3,28 +3,36 @@
 #' use nnet forecasting to evaluate future stock price.
 #'
 #' @param ticker security name, e.g. AAPL
-#' @param vendor provider for data
-#' @param look_back number of days to look back for predictions
-#' @param look_ahead number of days to forecast
-#' @param PI logical: should we compute prediction intervals?
+#' @param vendor provider for data: leave at yahoo unless you have paid for the quandl sharadar equity prices data feed.
+#' @param look_back number of days to look back for predictions: default is 200
+#' @param look_ahead number of days to forecast: default is 14
+#' @param PI logical: should we compute prediction intervals?: under development
 #' @inheritParams renarin_short_historic
 #'
 #' @importFrom magrittr %>%
 #' @export
 
-renarin_short <- function(ticker, vendor = "quandl", look_back = 200,
+renarin_short <- function(ticker, vendor = "yahoo", look_back = 200,
                           look_ahead = 14, lag = 10, decay = 0.2,
                           zoom_in = TRUE, PI = FALSE) {
   ticker1 = ticker #just to avoid any bugs due to non-standard eval
 
   date <- Sys.Date()
   min_date <- date - lubridate::days(look_back)
-  key <- get_api_key(vendor = vendor)
-  Quandl::Quandl.api_key(key)
-  df_model <- Quandl::Quandl.datatable('SHARADAR/SEP', date.gte=min_date,
-                   ticker= ticker1) %>%
-    dplyr::mutate(close_log = log(.data$close),
-                  rank = rank(date))
+
+  if(vendor == "quandl") {
+    key <- get_api_key(vendor = vendor)
+    Quandl::Quandl.api_key(key)
+    df_model <- Quandl::Quandl.datatable('SHARADAR/SEP', date.gte=min_date,
+                                         ticker= ticker1) %>%
+      dplyr::mutate(close_log = log(.data$close),
+                    rank = rank(date))
+  } else if(vendor == "yahoo") {
+    df_model <- tidyquant::tq_get(x = ticker1, from = min_date, to = date) %>%
+      dplyr::mutate(close_log = log(.data$close),
+                    rank = rank(date))
+  }
+
 
   #create differenced ts for modeling
   ts_close <- diff(zoo::zoo(x = df_model$close_log, order.by = df_model$rank))

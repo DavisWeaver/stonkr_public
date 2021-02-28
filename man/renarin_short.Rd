@@ -6,28 +6,31 @@
 \usage{
 renarin_short(
   ticker,
-  vendor = "quandl",
+  vendor = "yahoo",
   look_back = 200,
   look_ahead = 14,
   lag = 10,
   decay = 0.2,
-  zoom_in = TRUE
+  zoom_in = TRUE,
+  PI = FALSE
 )
 }
 \arguments{
 \item{ticker}{security name, e.g. AAPL}
 
-\item{vendor}{provider for data}
+\item{vendor}{provider for data: leave at yahoo unless you have paid for the quandl sharadar equity prices data feed.}
 
-\item{look_back}{number of days to look back for predictions}
+\item{look_back}{number of days to look back for predictions: default is 200}
 
-\item{look_ahead}{number of days to forecast}
+\item{look_ahead}{number of days to forecast: default is 14}
 
 \item{lag}{number of days to use to fit the next day in the model}
 
 \item{decay}{NNET parametar}
 
 \item{zoom_in}{should function return full model and forecast results? useful for highlighting speicific issues}
+
+\item{PI}{logical: should we compute prediction intervals?: under development}
 }
 \description{
 use nnet forecasting to evaluate future stock price.
