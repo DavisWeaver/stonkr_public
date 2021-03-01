@@ -20,11 +20,11 @@ full TOS here: https://app.termly.io/document/terms-of-use-for-saas/24d989ae-26f
 2. Next, install this package on your computer using devtools::install_github("DavisWeaver/stonkr", auth_token ="#GitHubPersonalAccessTokenHere"). The personal access Token can be generate from https://github.com/settings/tokens (thanks for @Hearthstone8888 for pointing out the auth_token issue).
 4. To forecast share price for a given security, simply use:
 ```
-renarin_short(ticker, zoom_in = FALSE)
+renarin_short(ticker, lag = 20, zoom_in = FALSE)
 ```
 4. For a full table containing the output (rather than a summary), specify zoom_in = TRUE. This is the data you will need to create visualizations. 
 ```
-renarin_short(ticker, zoom_in = TRUE)
+renarin_short(ticker, lag = 20, zoom_in = TRUE)
 ```
 5. For more options / customization, type the following to view the documentation.
 ```
@@ -44,7 +44,7 @@ ggplot(data = df, aes(x = date, y = fitted_actual)) +
 
 1. I don't recommend messing with the "vendor" parameter in renarin_short. That is mostly there so I can switch back and forth between the free yahoo data feed and the one I pay for. 
 
-2. the default modeling parameters were chosen after quite a bit of iteration and testing. They are: look back (how many days into the past should we use for training), look ahead (how many days should we project), decay(passed to NNET), and lag (how many days should we use to predict the single next data point). 
+2. the default modeling parameters were chosen after quite a bit of iteration and testing. They are: look back (how many days into the past should we use for training), look ahead (how many days should we project), decay(passed to NNET), and lag (how many days should we use to predict the single next data point). Note: My default lag parameter is 20, but the default in the function is 10 - I'll fix that in the next update but just change it to 20 when you run renarin_short if you'd like to use my current parameters.
 3. I highly recommend messing with them just to get a sense of what they all do and how they impact the forecasting results. 
 4. However, proceed with caution (well, even more caution) if you decide to tweak them for projections you plan to act on. If you do come across a recipe you think improves over the default settings and are comfortable sharing, I would love feedback!
 
