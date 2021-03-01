@@ -9,7 +9,7 @@ Thank you so much for your support. I hope you find this resource as interesting
 
 1. All code in this repository is copyrighted by DW Forecasting.
 2. Your access to this github repository is for personal use only. 
-3. You may not share this code with anyone without my express permission. 
+3. You may not share this code with anyone. 
 4. This software comes with absolutely no warranty.
 5. Davis Weaver and DW Forecasting are not liable for any gains or losses you might accrue trading using this software or related products. 
 
