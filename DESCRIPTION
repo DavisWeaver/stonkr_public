@@ -1,6 +1,6 @@
 Package: stonkr
 Title: Quantitative trading for the people
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R: 
     person(given = "Davis",
            family = "Weaver",
@@ -8,7 +8,7 @@ Authors@R:
            email = "davis.weaver@case.edu",
            comment = c(ORCID = "YOUR-ORCID-ID"))
 Description: data science tools to forecast future stock performance. 
-License: GPL (>= 3)
+License: Proprietary
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
