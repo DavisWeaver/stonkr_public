@@ -1,1 +1,1 @@
-Copyright DW Forecasting. All rights reserved.
+Copyright Davis Weaver. All rights reserved.

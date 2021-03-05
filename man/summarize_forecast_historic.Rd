@@ -4,7 +4,7 @@
 \alias{summarize_forecast_historic}
 \title{function to summarize the output of short-term model (for back-testing)}
 \usage{
-summarize_forecast_historic(df)
+summarize_forecast_historic(df, PI)
 }
 \arguments{
 \item{df}{dataframe containing projections for a given time period}

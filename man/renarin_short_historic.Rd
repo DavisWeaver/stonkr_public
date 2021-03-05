@@ -7,20 +7,19 @@
 renarin_short_historic(
   date = NULL,
   ticker,
-  df = NULL,
-  look_back = 300,
+  look_back = 200,
   look_ahead = 14,
   zoom_in = FALSE,
-  lag = 10,
-  decay = 0.2
+  lag = 20,
+  decay = 0.2,
+  vendor = "quandl",
+  PI = FALSE
 )
 }
 \arguments{
 \item{date}{if most recent == FALSE, what date should we project from?}
 
 \item{ticker}{security name, e.g. AAPL}
-
-\item{df}{if most_recent = FALSE, provide historical pricing dataframe}
 
 \item{look_back}{number of days to look back for predictions}
 
@@ -31,6 +30,8 @@ renarin_short_historic(
 \item{lag}{number of days to use to fit the next day in the model}
 
 \item{decay}{NNET parametar}
+
+\item{df}{if most_recent = FALSE, provide historical pricing dataframe}
 }
 \description{
 use nnet forecasting to evaluate future stock price.

@@ -5,7 +5,7 @@ Authors@R:
     person(given = "Davis",
            family = "Weaver",
            role = c("aut", "cre"),
-           email = "davis.weaver@case.edu",
+           email = "dweav94@gmail.com",
            comment = c(ORCID = "YOUR-ORCID-ID"))
 Description: data science tools to forecast future stock performance. 
 License: Proprietary
@@ -24,7 +24,14 @@ Imports:
     sweep, 
     bizdays,
     janitor,
-    zoo
+    zoo, 
+    rvest,
+    xml2,
+    parallel,
+    doParallel,
+    foreach,
+    purrr,
+    ps
 Suggests: 
     testthat (>= 2.0.0)
 Config/testthat/edition: 2

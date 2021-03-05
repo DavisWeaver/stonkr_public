@@ -44,9 +44,19 @@ renarin_short <- function(ticker, vendor = "yahoo", look_back = 200,
   }
 
   #fit the model and forecast
-  fit <- forecast::nnetar(y = ts_close, p = lag, P = 1, decay = decay)
-  fcast <- forecast::forecast(fit, h = look_ahead, PI=PI,
-                              bootstrap = TRUE)
+  fit <- try(forecast::nnetar(y = ts_close, p = lag, P = 1, decay = decay))
+  if(inherits(fit, "try-error")){
+    message(paste("not enough data to predict", ticker1, date))
+    return()
+  }
+
+  fcast <- try(forecast::forecast(fit, h = look_ahead, PI=PI,
+                              bootstrap = TRUE))
+
+  if(inherits(fcast, "try-error")){
+    message(paste("not enough data to predict", ticker1, date))
+    return()
+  }
 
   #tidy this shit up
   predic_df <- process_fit(fit = fit, fcast = fcast, df = df_model,
