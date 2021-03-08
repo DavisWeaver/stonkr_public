@@ -7,18 +7,16 @@ Thank you so much for your support. I hope you find this resource as interesting
 
 # Terms of Service
 
-1. All code in this repository is copyrighted by DW Forecasting.
-2. Your access to this github repository is for personal use only. 
-3. You may not share this code with anyone. 
-4. This software comes with absolutely no warranty.
-5. Davis Weaver and DW Forecasting are not liable for any gains or losses you might accrue trading using this software or related products. 
+1. This software comes with absolutely no warranty. 
+2. We are not liable for any investing or trading decisions you make.
+3. This is free, open-source, open-access software licensed under the GPL3 license.
 
 full TOS here: https://app.termly.io/document/terms-of-use-for-saas/24d989ae-26fd-4260-9ea7-3b3e691f79a8
 
 # Getting Started
 
 1. To get started, you will need R and Rstudio installed on your computer as well as the package "devtools"
-2. Next, install this package on your computer using devtools::install_github("DavisWeaver/stonkr", auth_token ="#GitHubPersonalAccessTokenHere"). The personal access Token can be generate from https://github.com/settings/tokens (thanks for @Hearthstone8888 for pointing out the auth_token issue).
+2. Next, install this package on your computer using devtools::install_github("DavisWeaver/stonkr_public")
 4. To forecast share price for a given security, simply use:
 ```
 renarin_short(ticker, lag = 20, zoom_in = FALSE)
@@ -45,12 +43,18 @@ ggplot(data = df, aes(x = date, y = fitted_actual)) +
 
 1. I don't recommend messing with the "vendor" parameter in renarin_short. That is mostly there so I can switch back and forth between the free yahoo data feed and the one I pay for. 
 
-2. the default modeling parameters were chosen after quite a bit of iteration and testing. They are: look back (how many days into the past should we use for training), look ahead (how many days should we project), decay(passed to NNET), and lag (how many days should we use to predict the single next data point). Note: My default lag parameter is 20, but the default in the function is 10 - I'll fix that in the next update but just change it to 20 when you run renarin_short if you'd like to use my current parameters.
+2. the default modeling parameters are just examples - forecasts using them have been shown to be very poor at predicting price. 
 3. I highly recommend messing with them just to get a sense of what they all do and how they impact the forecasting results. 
-4. However, proceed with caution (well, even more caution) if you decide to tweak them for projections you plan to act on. If you do come across a recipe you think improves over the default settings and are comfortable sharing, I would love feedback!
 
-5. Some of the code that I use to actually generate reports you may have seen currently resides outside of the package. My first priority is to rectify that so you have access to all the functionality that I do. Expect a few more functions to appear on this repository in the next week or so. These include the screener functions I described in my recent patreon update.
+4. Most of the current functionality is through the renarin_short function. There are a few in-development areas that you probably don't want to touch. The create_reference document is an in-development group of functions for putting together a training dataset for other machine learning forecasting methods I have planned. I'm guessing they will break as currently written outside of my laptop. 
+5. backest_short is a convenient function that calls renarin_short_historic repeatedly to evaluate the accuracy of model forecast parameters. Unfortunately, due to the issues with the yahoo finance API call number, this will only work if you pay for the SHaradar equity price tables on Quandl. - If you do decide to do that, simply put your API key into the "get_api_key" function in the quandl section and then set your vendor to quandl when making forecasts.
 
-4. Most of the current functionality is through the renarin_short function. There are a few in-development areas that you probably don't want to touch. The create_reference document is an in-development group of functions for putting together a training dataset for other machine learning forecasting methods I have planned. I'm guessing they will break as currently written outside of my laptop. renarin_short_historic is similar to renarin_short but set up to evaluate forecasts in historical data. You can use it nearly the same way as renarin_short, except that it requires you to submit a dataframe containing all relevant historical price data for the security you specify. I used ~30 years of historical data from the sharadar equity prices on quandl. There are sadly no good historical data sources for stock prices that I could find for free. If you find one, please let me know so I can update the readme with instructions for how to get it. 
+# Support
 
-Feel free to email me at dweav94@gmail.com if you have any issues or questions!
+To try and preserve some balance with my main gig as a researcher, I am currently only providing technical support to patreon subscribers (www.patreon.com/DavisWeaver). 
+
+# Whats next?
+
+I have not found these single-stock forecasts to be very useful for guiding investment decisions. I am putting this package out as is mostly as a teaching/learning tool but its possible that someone smarter than me could tweak the parameters or extend the modeling framework to make useful inferences about future stock movement.
+
+For me, I'm going to keep building tools/ adding functionality to this package to try and make it a tool that will generate some alpha for algo-developers and traders. If you would like to support those future developments - find me on www.patreon.com/DavisWeaver. New features will be rolled out in a private repo for patreon subscribers first before being pushed to the public repository. I am also writing about my progress / what I'm trying on www.dw-forecasting.com and reddit.com/r/dw_forecasting. 
