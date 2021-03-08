@@ -8,7 +8,7 @@ Authors@R:
            email = "dweav94@gmail.com",
            comment = c(ORCID = "YOUR-ORCID-ID"))
 Description: data science tools to forecast future stock performance. 
-License: Proprietary
+License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)

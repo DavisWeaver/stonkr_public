@@ -68,7 +68,7 @@ clean_fundamentals <- function(df, year) {
 
 get_api_key <- function(vendor = "quandl") {
   if(vendor == "quandl") {
-    return("swwZpTLG2pozy2rLidxc") #add you own API key here
+    return() #add you own API key here
   }
 }
 

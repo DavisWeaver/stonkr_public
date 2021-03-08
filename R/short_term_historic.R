@@ -19,8 +19,16 @@ renarin_short_historic <- function(date = NULL, ticker,
                                    look_back = 200, look_ahead = 14,
                                    zoom_in = FALSE, lag = 20, decay = 0.2,
                                    vendor = "quandl", PI = FALSE) {
+
   #first filter data frame down to the specified date range
   max_date <- date + lubridate::days(look_ahead)
+
+  #throw an error if the max date is after current date
+  if(max_date > Sys.Date()) {
+    message("provided date too close to current date")
+    return()
+  }
+
   min_date <- date - lubridate::days(look_back)
 
   #need to rename user-provided ticker because the dplyr non-standard evaluation gets confused
