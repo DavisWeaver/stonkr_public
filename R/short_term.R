@@ -13,7 +13,7 @@
 #' @export
 
 renarin_short <- function(ticker, vendor = "yahoo", look_back = 200,
-                          look_ahead = 14, lag = 10, decay = 0.2,
+                          look_ahead = 14, lag = 20, decay = 0.2,
                           zoom_in = TRUE, PI = FALSE) {
   ticker1 = ticker #just to avoid any bugs due to non-standard eval
 
@@ -30,7 +30,8 @@ renarin_short <- function(ticker, vendor = "yahoo", look_back = 200,
   } else if(vendor == "yahoo") {
     df_model <- tidyquant::tq_get(x = ticker1, from = min_date, to = date) %>%
       dplyr::mutate(close_log = log(.data$close),
-                    rank = rank(date))
+                    rank = rank(date),
+                    ticker = symbol)
   }
 
 
