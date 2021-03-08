@@ -3,7 +3,7 @@ Functions to forecast security price in US stock markets
 
 # Welcome! 
 
-Thank you so much for your support. I hope you find this resource as interesting and useful as I have. You'll find start up instructions further down but lets get some admin out of the way.
+Thank you so much for your interest in this project. I hope you find this resource as interesting and useful as I have. You'll find start up instructions further down but lets get some admin out of the way.
 
 # Terms of Service
 
