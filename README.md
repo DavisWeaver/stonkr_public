@@ -55,3 +55,7 @@ To try and preserve some balance with my main gig as a researcher, I am not able
 # Whats next?
 
 I have not found these single-stock forecasts to be very useful for guiding investment decisions. I am putting this package out as is mostly as a teaching/learning tool but its possible that someone smarter than me could tweak the parameters or extend the modeling framework to make useful inferences about future stock movement.
+
+# Donate
+
+You can find me on venmo www.venmo.com/Davis-Weaver
