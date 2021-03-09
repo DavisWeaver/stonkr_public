@@ -11,7 +11,6 @@ Thank you so much for your interest in this project. I hope you find this resour
 2. We are not liable for any investing or trading decisions you make.
 3. This is free, open-source, open-access software licensed under the GPL3 license.
 
-full TOS here: https://app.termly.io/document/terms-of-use-for-saas/24d989ae-26fd-4260-9ea7-3b3e691f79a8
 
 # Getting Started
 
@@ -51,10 +50,8 @@ ggplot(data = df, aes(x = date, y = fitted_actual)) +
 
 # Support
 
-To try and preserve some balance with my main gig as a researcher, I am currently only providing technical support to patreon subscribers (www.patreon.com/DavisWeaver). 
+To try and preserve some balance with my main gig as a researcher, I am not able to be available all the time for support - if you have questions, email me at dweav94@gmail.com and I'll try to get back to you. 
 
 # Whats next?
 
 I have not found these single-stock forecasts to be very useful for guiding investment decisions. I am putting this package out as is mostly as a teaching/learning tool but its possible that someone smarter than me could tweak the parameters or extend the modeling framework to make useful inferences about future stock movement.
-
-For me, I'm going to keep building tools/ adding functionality to this package to try and make it a tool that will generate some alpha for algo-developers and traders. If you would like to support those future developments - find me on www.patreon.com/DavisWeaver. New features will be rolled out in a private repo for patreon subscribers first before being pushed to the public repository. I am also writing about my progress / what I'm trying on www.dw-forecasting.com and reddit.com/r/dw_forecasting. 
